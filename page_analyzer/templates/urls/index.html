@@ -1,27 +1,41 @@
 {% extends 'layouts/layout.html' %}
 
 {% block content %}
-  <div class="container-lg mt-3">
-    <h1>Сайты</h1>
-    <div class="table-responsive">
-      <table class="table table-bordered table-hover text-nowrap" data-test="urls">
-        <tbody>
-          <tr>
-            <th>ID</th>
-            <th>Имя</th>
-            <th>Последняя проверка</th>
-            <th>Код ответа</th>
-          </tr>
-          {% for site in sites %}
-          <tr>
-            <th>{{ site.id }}</th>
-            <th>{{ site.name }}</th>
-            <th>{{ site.last_check }}</th>
-            <th>{{ site.response_code }}</th>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{category}}" role="alert">{{ message }}</div>
+    {% endfor %}
+    {% endif %}
+  <main class="flex-grow-1">
+    <div class="container-lg mt-3">
+      
+      <h1>Сайты</h1>
+      <div class="table-responsive">
+        <table class="table table-bordered table-hover text-nowrap" data-test="urls">
+          <tbody>
+            <tr>
+              <th>ID</th>
+              <th>Имя</th>
+              <th>Последняя проверка</th>
+              <th>Код ответа</th>
+            </tr>
+            {% for site, check in sites %}
+            <tr>
+              <td>{{ site.id }}</td>
+              <td><a href="{{ url_for("show_url", id = site.id) }}">{{ site.name }}</a></td>
+              {% if check %}
+                <td>{{ check.created_at.strftime('%Y-%m-%d') }}</td>
+                <td>{{ check.status_code }}</td>
+              {% else %}
+                <td></td>
+                <td></td>
+              {% endif %}
+              
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
     </div>
-  </div>
+  </main>
 {% endblock %}
