@@ -41,7 +41,7 @@ def urls():
 @app.post('/urls')
 def post_url():
     form_data = request.form.to_dict()
-    url = normalize(form_data.get('url'))
+    url = form_data.get('url')
     errors = validate(url)
 
     if errors:
@@ -49,6 +49,7 @@ def post_url():
             flash(error, 'danger')
         return render_template('index.html', url_name=url), 422
 
+    url = normalize(url)
     existing_url = db.get_url_by_name(url)
 
     if not existing_url:
