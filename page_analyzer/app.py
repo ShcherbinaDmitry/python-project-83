@@ -84,7 +84,7 @@ def check_url(id):
     try:
         res = requests.get(url)
         res.raise_for_status()
-    except requests.exceptions.RequstException:
+    except requests.exceptions.RequestException:
         flash('Произошла ошибка при проверке', 'danger')
         return redirect(url_for('show_url', id=id))
 
