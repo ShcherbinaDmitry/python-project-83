@@ -1,5 +1,6 @@
 import pytest
-from page_analyzer import app;
+from page_analyzer import app
+
 
 @pytest.fixture()
 def create_app():
@@ -12,7 +13,7 @@ def create_app():
 
     yield app_instance
 
-#     # clean up / reset resources here
+# clean up / reset resources here
 
 # @pytest.fixture()
 # def client(app_instance):
