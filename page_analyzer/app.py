@@ -1,15 +1,23 @@
-from flask import Flask, render_template, redirect, url_for, flash, get_flashed_messages, request, abort
+from flask import (
+    Flask,
+    render_template,
+    redirect,
+    url_for,
+    flash,
+    get_flashed_messages,
+    request,
+    abort
+)
 import os
 import requests
-from page_analyzer.validator import validate, normalize
-import page_analyzer.db as db
 from itertools import zip_longest
 from bs4 import BeautifulSoup
+from page_analyzer.validator import validate, normalize
+import page_analyzer.db as db
 
 app = Flask(__name__)
-app.config.update(
-    SECRET_KEY = os.getenv('SECRET_KEY')
-)
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
+app.config['DATABASE_URL'] = os.getenv('DATABASE_URL')
 
 
 @app.route('/')
@@ -22,9 +30,9 @@ def urls():
     messages = get_flashed_messages(with_categories=True)
     sites = db.get_urls()
     checks = db.get_checks()
-    sites_with_checks = zip_longest(sites, checks)
+    data = zip_longest(sites, checks)
 
-    return render_template('urls/index.html', sites=sites_with_checks, messages=messages)
+    return render_template('urls/index.html', sites=data, messages=messages)
 
 
 @app.post('/urls')
@@ -38,7 +46,6 @@ def post_url():
             flash(error, 'danger')
         return render_template('index.html', url_name=url), 422
 
-    ## Запись в бд
     existing_url = db.get_url_by_name(url)
 
     if not existing_url:
@@ -48,8 +55,8 @@ def post_url():
         flash('Страница уже существует', 'info')
         id = existing_url.id
 
-
     return redirect(url_for('show_url', id=id))
+
 
 @app.get('/urls/<int:id>')
 def show_url(id):
@@ -59,7 +66,12 @@ def show_url(id):
     if not url:
         abort(404)
     checks = db.get_checks_for_url(id)
-    return render_template('urls/show.html', url=url, checks=checks, messages=messages)
+    return render_template(
+        'urls/show.html',
+        url=url,
+        checks=checks,
+        messages=messages
+    )
 
 
 @app.post('/urls/<int:id>/checks')
@@ -75,7 +87,11 @@ def check_url(id):
 
     # Write check to db
     page = res.text
-    page_data = {'url_id': id, 'status_code': res.status_code, **get_data(page)}
+    page_data = {
+        'url_id': id,
+        'status_code': res.status_code,
+        **get_data(page)
+    }
     db.add_check(page_data)
     flash('Страница успешно проверена', 'success')
     return redirect(url_for('show_url', id=id))
@@ -96,9 +112,11 @@ def get_data(page):
         'description': description[:255],
     }
 
+
 @app.errorhandler(404)
 def page_not_found(error):
     return render_template('404.html'), 404
+
 
 @app.errorhandler(500)
 def server_error(error):

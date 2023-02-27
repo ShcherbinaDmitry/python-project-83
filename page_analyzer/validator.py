@@ -1,6 +1,7 @@
 from urllib.parse import urlparse
 from validators.url import url as url_validator
 
+
 def validate(url):
     errors = []
     if len(url) > 255:
@@ -13,5 +14,5 @@ def validate(url):
 
 
 def normalize(url):
-  parsed = urlparse(url)
-  return f'{parsed.scheme}://{parsed.netloc}'
+    parsed = urlparse(url)
+    return f'{parsed.scheme}://{parsed.netloc}'
