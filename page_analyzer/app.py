@@ -47,7 +47,7 @@ def post_url():
     if errors:
         for error in errors:
             flash(error, 'danger')
-        return render_template('index.html', url_name=url), 422
+        return render_template('index.html', url_name=url, messages=get_flashed_messages(with_categories=True)), 422
 
     url = normalize(url)
     existing_url = db.get_url_by_name(url)
