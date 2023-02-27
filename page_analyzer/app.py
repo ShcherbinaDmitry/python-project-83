@@ -10,10 +10,13 @@ from flask import (
 )
 import os
 import requests
+from dotenv import load_dotenv
 from itertools import zip_longest
 from bs4 import BeautifulSoup
 from page_analyzer.validator import validate, normalize
 import page_analyzer.db as db
+
+load_dotenv()
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
